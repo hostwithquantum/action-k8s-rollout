@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# fake kubectl for tests, controlled by STUB_* variables
+echo "$*" >>"$KUBECTL_LOG"
+
+case $1 in
+  rollout)
+    sleep "${STUB_SLEEP:-0}"
+    case " ${STUB_FAIL:-} " in
+      *" $3 "*)
+        echo "error: timed out waiting for the condition" >&2
+        exit 1
+        ;;
+    esac
+    echo "$3 successfully rolled out"
+    ;;
+  get)
+    printf '%s' "${STUB_GET:-}"
+    exit "${STUB_GET_EXIT:-0}"
+    ;;
+  describe)
+    echo "described $2"
+    ;;
+esac
